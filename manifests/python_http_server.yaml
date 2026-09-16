@@ -18,7 +18,7 @@ spec:
       - name: python-server
         image: python:3.12-slim
         ports:
-        - containerPort: 80
+        - containerPort: 8000
         command: ["python", "-m", "http.server","8000"]
 
         resources:
@@ -32,13 +32,13 @@ spec:
         readinessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8000
           failureThreshold: 3
 
         livenessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8000
           initialDelaySeconds: 10
           periodSeconds: 10
           timeoutSeconds: 2
@@ -55,5 +55,5 @@ spec:
   ports:
     - protocol: TCP
       port: 8000
-      targetPort: 80
+      targetPort: 8000
   type: ClusterIP
