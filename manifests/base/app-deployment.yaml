@@ -4,8 +4,7 @@ metadata:
   name: python-server
   labels:
     app: python-http-server
-  annotations: 
-    version: v1
+
     
   
 spec:
@@ -18,20 +17,32 @@ spec:
     metadata:
       labels:
         app: python-http-server
-
+      annotations: 
+        version: v1
+        
     spec:
       containers:
       - name: python-server
         image: python:3.12-slim
         ports: # удалить если порт будет из переменных
         - containerPort: 8000 
-        command: ["python", "-m", "http.server","8000"]
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "=== Environment variables ==="
+          echo "APP_PORT=$APP_PORT"
+          echo "LOG_LEVEL=$LOG_LEVEL"
+          echo "APP_ENV=$APP_ENV"
+          echo "ACCESS_TOKEN=$ACCESS_TOKEN"
+          echo "API_KEY=$API_KEY"
+          echo "============================="
+          python -m http.server 8000
 
         envFrom: # пробрасывает все переменные из app-config.yam
         - configMapRef:
             name: python-config
         - secretRef:
-            name: token
+            name: python-secret
 
         resources:
           requests:
