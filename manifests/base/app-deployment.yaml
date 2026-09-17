@@ -4,22 +4,34 @@ metadata:
   name: python-server
   labels:
     app: python-http-server
+  annotations: 
+    version: v1
+    
+  
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: python-http-server
+
   template:
     metadata:
       labels:
         app: python-http-server
+
     spec:
       containers:
       - name: python-server
         image: python:3.12-slim
-        ports:
-        - containerPort: 8000
+        ports: # удалить если порт будет из переменных
+        - containerPort: 8000 
         command: ["python", "-m", "http.server","8000"]
+
+        envFrom: # пробрасывает все переменные из app-config.yam
+        - configMapRef:
+            name: python-config
+        - secretRef:
+            name: token
 
         resources:
           requests:
@@ -43,17 +55,3 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 2
           failureThreshold: 3
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: python-server
-spec:
-  selector:
-    app: python-http-server
-  ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
-  type: ClusterIP
